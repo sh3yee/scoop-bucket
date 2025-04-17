@@ -1,0 +1,97 @@
+name: 自动更新应用版本
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天 UTC 00:00 运行（北京时间早上8点）
+  workflow_dispatch:      # 允许手动触发
+
+jobs:
+  update:
+    runs-on: windows-latest
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: 设置 Git 用户信息
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      
+      - name: 克隆 Scoop 仓库
+        run: |
+          git clone https://github.com/ScoopInstaller/Scoop.git $env:TEMP\Scoop
+      
+      - name: 创建更新脚本
+        run: |
+          @"
+          param (
+              [string]`$App = "*"
+          )
+          
+          `$ErrorActionPreference = 'Stop'
+          `$bucketDir = '${env:GITHUB_WORKSPACE}'
+          `$manifestsDir = Join-Path `$bucketDir 'bucket'
+          `$scoopDir = '${env:TEMP}\Scoop'
+          `$checkverScript = Join-Path `$scoopDir 'bin\checkver.ps1'
+          
+          if (-not (Test-Path `$checkverScript)) {
+              throw "找不到 checkver.ps1 脚本！"
+          }
+          
+          # 创建临时目录用于存储更新日志
+          `$logDir = Join-Path `$env:TEMP 'update-logs'
+          New-Item -ItemType Directory -Path `$logDir -Force | Out-Null
+          
+          # 运行 checkver 脚本并获取更新日志
+          `$logFile = Join-Path `$logDir 'updates.txt'
+          & `$checkverScript -App `$App -Dir `$manifestsDir -Update *> `$logFile
+          
+          # 获取更新的应用列表
+          `$updatedApps = @()
+          if (Test-Path `$logFile) {
+              `$logContent = Get-Content `$logFile -Raw
+              `$matches = [regex]::Matches(`$logContent, "(?m)^([\w-]+).*: (\d+\.\d+.*) -> (\d+\.\d+.*)`$")
+              foreach (`$match in `$matches) {
+                  `$appName = `$match.Groups[1].Value
+                  `$oldVersion = `$match.Groups[2].Value
+                  `$newVersion = `$match.Groups[3].Value
+                  `$updatedApps += @{
+                      "name" = `$appName
+                      "old" = `$oldVersion
+                      "new" = `$newVersion
+                  }
+              }
+          }
+          
+          # 返回更新的应用信息
+          return `$updatedApps
+          "@ | Out-File -FilePath update-script.ps1 -Encoding utf8
+      
+      - name: 运行更新脚本
+        id: run-update
+        run: |
+          $updates = .\update-script.ps1
+          $updatedApps = $updates | Where-Object { $_ -ne $null }
+          
+          if ($updatedApps.Count -gt 0) {
+            Write-Host "Found updates for $($updatedApps.Count) apps"
+            $commitMsg = "更新应用版本: "
+            foreach ($app in $updatedApps) {
+              $commitMsg += "$($app.name) $($app.old) -> $($app.new), "
+            }
+            $commitMsg = $commitMsg.TrimEnd(", ")
+            Write-Host "::set-output name=has_updates::true"
+            Write-Host "::set-output name=commit_msg::$commitMsg"
+          } else {
+            Write-Host "No updates found"
+            Write-Host "::set-output name=has_updates::false"
+          }
+      
+      - name: 提交更改
+        if: steps.run-update.outputs.has_updates == 'true'
+        run: |
+          git add bucket/*.json
+          git commit -m "${{ steps.run-update.outputs.commit_msg }}"
+          git push origin HEAD:main
