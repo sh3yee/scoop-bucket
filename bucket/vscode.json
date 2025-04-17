@@ -1,0 +1,50 @@
+{
+    "version": "1.87.2",
+    "description": "Lightweight but powerful source code editor",
+    "homepage": "https://code.visualstudio.com/",
+    "license": {
+        "identifier": "MIT",
+        "url": "https://github.com/microsoft/vscode/blob/main/LICENSE.txt"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://update.code.visualstudio.com/1.87.2/win32-x64-user/stable",
+            "hash": "3e3fb23e99dbdba84b0ff27f29e4bb5b2f3cdbf9b4c8ea8c1b5ba0caac3c4a80"
+        },
+        "arm64": {
+            "url": "https://update.code.visualstudio.com/1.87.2/win32-arm64-user/stable",
+            "hash": "ff46d27bf738bd7bf9bc07f4a8c3b93a8fda2be357ec68a3fea852ebb9e89aed"
+        }
+    },
+    "bin": [
+        [
+            "bin\\code.cmd",
+            "code"
+        ]
+    ],
+    "shortcuts": [
+        [
+            "Code.exe",
+            "Visual Studio Code"
+        ]
+    ],
+    "post_install": [
+        "if (!(Test-Path \"$env:APPDATA\\Code\\User\\settings.json\")) {",
+        "    New-Item -Force -Path \"$env:APPDATA\\Code\\User\\settings.json\" -ItemType File -Value '{}' | Out-Null",
+        "}"
+    ],
+    "checkver": {
+        "url": "https://update.code.visualstudio.com/api/releases/stable",
+        "regex": "\"name\":\\s*\"([\\d.]+)\""
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://update.code.visualstudio.com/$version/win32-x64-user/stable"
+            },
+            "arm64": {
+                "url": "https://update.code.visualstudio.com/$version/win32-arm64-user/stable"
+            }
+        }
+    }
+}

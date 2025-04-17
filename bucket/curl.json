@@ -1,0 +1,35 @@
+{
+    "version": "8.5.0",
+    "description": "Command line tool and library for transferring data with URLs",
+    "homepage": "https://curl.se/",
+    "license": "curl",
+    "architecture": {
+        "64bit": {
+            "url": "https://curl.se/windows/dl-8.5.0/curl-8.5.0-win64-mingw.zip",
+            "hash": "9c8118e6550d9187d43d6ef38ff7d4df1bc844e75e5fbee93d21b10337cc5a1f",
+            "extract_dir": "curl-8.5.0-win64-mingw"
+        },
+        "32bit": {
+            "url": "https://curl.se/windows/dl-8.5.0/curl-8.5.0-win32-mingw.zip",
+            "hash": "8c34f40b33ff6cab12c5ecc36f1c6ca3fee0ed36b7d2e763f80cf0d0a65db9e2",
+            "extract_dir": "curl-8.5.0-win32-mingw"
+        }
+    },
+    "bin": "bin\\curl.exe",
+    "checkver": {
+        "url": "https://curl.se/windows/",
+        "regex": "dl-([\\d.]+)/curl"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://curl.se/windows/dl-$version/curl-$version-win64-mingw.zip",
+                "extract_dir": "curl-$version-win64-mingw"
+            },
+            "32bit": {
+                "url": "https://curl.se/windows/dl-$version/curl-$version-win32-mingw.zip",
+                "extract_dir": "curl-$version-win32-mingw"
+            }
+        }
+    }
+}

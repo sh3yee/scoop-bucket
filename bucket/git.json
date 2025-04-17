@@ -1,0 +1,50 @@
+{
+    "version": "2.44.0.windows.1",
+    "description": "Distributed version control system",
+    "homepage": "https://gitforwindows.org",
+    "license": "GPL-2.0-only",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.44.0.windows.1/PortableGit-2.44.0-64-bit.7z.exe#/dl.7z",
+            "hash": "b42a9db3bc8db63e8d0d7f84f56d4b0b43ea8ae7ee3a4e3df064eb23f68bfdf3"
+        },
+        "32bit": {
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.44.0.windows.1/PortableGit-2.44.0-32-bit.7z.exe#/dl.7z",
+            "hash": "f8c1c6ba7f7d23493e5df7fc11adecbe20afe8c47547e5ed68adff0a3ba00faa"
+        }
+    },
+    "bin": [
+        "cmd\\git.exe",
+        "cmd\\gitk.exe",
+        "cmd\\git-gui.exe",
+        "usr\\bin\\tig.exe",
+        "git-bash.exe"
+    ],
+    "shortcuts": [
+        [
+            "git-bash.exe",
+            "Git Bash"
+        ],
+        [
+            "cmd\\git-gui.exe",
+            "Git GUI"
+        ]
+    ],
+    "env_set": {
+        "GIT_INSTALL_ROOT": "$dir"
+    },
+    "checkver": {
+        "url": "https://github.com/git-for-windows/git/releases/latest",
+        "regex": "v([\\w.]+)/PortableGit-(?<mingit>[\\w.]+)-64-bit"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/git-for-windows/git/releases/download/v$version/PortableGit-$matchMingit-64-bit.7z.exe#/dl.7z"
+            },
+            "32bit": {
+                "url": "https://github.com/git-for-windows/git/releases/download/v$version/PortableGit-$matchMingit-32-bit.7z.exe#/dl.7z"
+            }
+        }
+    }
+}

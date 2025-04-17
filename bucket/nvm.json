@@ -1,0 +1,42 @@
+{
+    "version": "1.1.11",
+    "description": "A node.js version management utility for Windows",
+    "homepage": "https://github.com/coreybutler/nvm-windows",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/coreybutler/nvm-windows/releases/download/1.1.11/nvm-setup.zip",
+            "hash": "0258f322e5e3e0da1f08dc5bc4295dc43af2e6d667a32a8ef2dacca01c52d6c3"
+        }
+    },
+    "extract_dir": "nvm",
+    "bin": [
+        "nvm.exe"
+    ],
+    "env_add_path": ".",
+    "env_set": {
+        "NVM_HOME": "$dir",
+        "NVM_SYMLINK": "$dir\\nodejs"
+    },
+    "post_install": [
+        "Write-Host 'NVM for Windows has been installed successfully!' -ForegroundColor Green",
+        "Write-Host 'Run these commands to install Node.js:' -ForegroundColor Yellow",
+        "Write-Host '  nvm list available' -ForegroundColor Cyan",
+        "Write-Host '  nvm install <version>' -ForegroundColor Cyan",
+        "Write-Host '  nvm use <version>' -ForegroundColor Cyan"
+    ],
+    "persist": [
+        "nodejs",
+        "settings.txt"
+    ],
+    "checkver": {
+        "github": "https://github.com/coreybutler/nvm-windows"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/coreybutler/nvm-windows/releases/download/$version/nvm-setup.zip"
+            }
+        }
+    }
+}
